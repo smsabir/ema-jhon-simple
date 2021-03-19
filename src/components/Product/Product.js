@@ -4,9 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
 
-const Product = (props) => {
+const Product = (props) => { //const Product = ( {product, handleAddProduct}) direct destructuring
     //console.log(props)
-    const { img, name, seller, price, stock, key } = props.product;
+    const {product, handleAddProduct} = props;
+    const { img, name, seller, price, stock, key } = product;
     return (
         <div className="product">
             <div>
@@ -20,7 +21,7 @@ const Product = (props) => {
                 <p><small>Only {stock} left in stock - Order soon</small></p>
                 {props.showAddToCart &&  <button 
                     className="main-button"
-                    onClick={() => props.handleAddProduct(props.product)}
+                    onClick={() => handleAddProduct(product)}
                     >
                         <FontAwesomeIcon icon={faCartPlus} /> add to cart
                 </button>}
