@@ -1,25 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import fakeData from '../../fakeData';
 import { addToDatabaseCart, getDatabaseCart } from '../../utilities/databaseManager';
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
 import { Link } from 'react-router-dom';
+import { LinearProgress } from '@material-ui/core';
 
 const Shop = () => {
-    const first10 = fakeData.slice(0,10);
-    const [products, setProducts] = useState(first10);
+    // const first10 = fakeData.slice(0,10);
+    const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
+    const [search, setSearch] = useState('');
+
+    const handleSearch = event => {
+        setSearch(event.target.value);
+    }
+    console.log(search);
+
+    useEffect(() => {
+        fetch('http://boiling-woodland-07762.herokuapp.com/products?search='+search)
+        .then(res => res.json())
+        .then(data => setProducts(data))
+    }, [])
 
     useEffect(() => {
         const savedCart = getDatabaseCart();
         const productKeys = Object.keys(savedCart);
-        const previousCart = productKeys.map(existingKey => {
-            const product = fakeData.find(pd => pd.key === existingKey);
-            product.quantity = savedCart[existingKey];
-            return product;
+        fetch('http://boiling-woodland-07762.herokuapp.com/productsByKeys', {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify(productKeys)
         })
-        setCart(previousCart);
+        .then(res => res.json())
+        .then(data => setCart(data))
     },[])
 
 
@@ -47,6 +62,12 @@ const Shop = () => {
     return (
         <div className="twin-container">
             <div className="product-container">
+                {
+                    products.length === 0 && <> <LinearProgress /> <LinearProgress color="secondary" /> </>
+                }
+                {
+                  products.length > 0 &&  <input id="search-field" type="text" placeholder="Search Product" onBlur={handleSearch}/>
+                }
                 {
                     products.map(product => <Product
                         showAddToCart ={true} 
